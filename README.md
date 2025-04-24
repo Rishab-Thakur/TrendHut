@@ -1,54 +1,146 @@
-# React + TypeScript + Vite
+# 📱 TrendHut - Vite PWA App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple Progressive Web App (PWA) built using **React**, **Vite**, and **Firebase Cloud Messaging**. This app supports **offline functionality** with a service worker and enables **push notifications** using Firebase.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌐 Live Demo
 
-## Expanding the ESLint configuration
+*https://trend-hut-nine.vercel.app*
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
+## 📦 Features
+
+- ✅ Installable PWA on mobile and desktop  
+- ⚡ Blazing fast performance with Vite  
+- 🔔 Push Notifications using Firebase Cloud Messaging  
+- 🌐 Works offline via service worker  
+- 📝 Dynamic manifest with `vite-plugin-pwa`
+
+---
+
+## 🛠️ Tech Stack
+
+- React + TypeScript  
+- Vite  
+- vite-plugin-pwa  
+- Firebase Cloud Messaging (FCM)
+
+---
+
+## 📄 PWA Configuration Report
+
+### 1. ✅ Steps to Configure `manifest.json`
+
+In Vite, we use the `vite-plugin-pwa` plugin to configure the PWA. There's no need to create a separate `manifest.json`. The plugin handles it automatically through the `vite.config.ts`:
+
+```ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [react(), VitePWA({
+    includeAssets: ['vite.svg'],
+    manifest: {
+      name: 'My Vite PWA App',
+      short_name: 'VitePWA',
+      description: 'A Progressive Web App built with Vite',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+      start_url: '/',
+      display: 'standalone',
+      icons: [
+        {
+          src: 'vite.svg',
+          sizes: 'any',
+          type: 'image/svg+xml',
+          purpose: 'any maskable'
+        }
+      ]
+    }
+  })],
 })
+
 ```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 🔧 Steps to Register Service Worker
+The service worker for offline support is automatically generated and registered by vite-plugin-pwa.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+For push notifications, a custom service worker file named firebase-messaging-sw.js is added in the public directory:
+```ts
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js');
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+firebase.initializeApp({
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/vite.svg',
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
 ```
+---
+
+### 3. In App.tsx, the Firebase messaging permission and foreground listener are called:
+```
+import React, { useEffect } from "react";
+import AppRoutes from "./routes/AppRoutes";
+import { NotificationPermission, onFirebaseMessage } from "./firebase";
+
+const App: React.FC = () => {
+  useEffect(() => {
+    NotificationPermission();
+    onFirebaseMessage();
+  }, []);
+
+  return <AppRoutes />;
+};
+
+export default App;
+```
+---
+
+### 📲 Mobile Installation Steps
+Open the app in Google Chrome on your mobile device.
+
+Tap the menu icon (three dots) in the top-right corner.
+
+Tap "Add to Home screen".
+
+Confirm the installation prompt.
+
+The app will now be accessible from your device like a native app.
+
+---
+
+### 📁 Project Repo
+🔗 GitHub Repository: https://github.com/Rishab-Thakur/TrendHut
+
+---
+
+### 📬 Contact
+For questions, feedback, or suggestions, feel free to create an issue or contact me via GitHub.
+
+---
+
+### ⭐ If you found this project helpful, don't forget to leave a star!
+
