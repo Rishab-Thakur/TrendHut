@@ -101,7 +101,7 @@ messaging.onBackgroundMessage((payload) => {
 ---
 
 ### 3. In App.tsx, the Firebase messaging permission and foreground listener are called:
-```
+```ts
 import React, { useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { NotificationPermission, onFirebaseMessage } from "./firebase";
